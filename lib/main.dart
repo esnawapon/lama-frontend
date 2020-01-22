@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
 import './app-theme.dart';
@@ -46,12 +48,88 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class AfterSplash extends StatefulWidget {
+  AfterSplash({Key key}) : super (key: key);
 
-class AfterSplash extends StatelessWidget {
-  void _onAddButtonClick() {
-    // setState(() {
-    //   _counter++;
-    // });
+  @override
+  _AfterSplash createState() => _AfterSplash();
+}
+
+class _AfterSplash extends State<AfterSplash> {
+  bool isFormValid = false;
+  final _newWordFormKey = GlobalKey<FormState>();
+  void _onSave() {
+    if (_newWordFormKey.currentState.validate()) {
+      // call api to save
+    } else {
+      // do nothing
+    }
+  }
+
+  void _onAddButtonClick(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: new Text('New word'),
+              content: Form(
+                key: _newWordFormKey,
+                child: Container(
+                  height: 200,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Word'
+                        ),
+                        validator: (value) {
+                          return value.isEmpty ? 'required' : null;
+                        },
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            setState(() {
+                              isFormValid = false;
+                            });
+                          } else {
+                            setState(() {
+                              isFormValid = true;
+                            });
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Definition'
+                        ),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Quote'
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text('CLOSE'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text('SAVE'),
+                  onPressed: isFormValid ? _onSave : null,
+                )
+              ],
+            );
+          }
+        );
+      }
+    );
   }
 
   @override
@@ -75,7 +153,7 @@ class AfterSplash extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _onAddButtonClick,
+        onPressed: () => _onAddButtonClick(context),
         child: Icon(
           Icons.add,
           color: Colors.white
