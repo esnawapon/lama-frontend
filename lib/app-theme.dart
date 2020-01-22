@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AppTheme {
   static const mainHex = 0xFF47B6BD;
+  static const Color mainColor = Color(mainHex);
   static const logoFile = 'assets/lama.png';
+  static const logoBgFile = 'assets/lama-bg.png';
   static const MaterialColor mainMaterial = MaterialColor(mainHex, {
-    50:  const Color(mainHex),
-    100: const Color(mainHex),
-    200: const Color(mainHex),
-    300: const Color(mainHex),
-    400: const Color(mainHex),
-    500: const Color(mainHex),
-    600: const Color(mainHex),
-    700: const Color(mainHex),
-    800: const Color(mainHex),
-    900: const Color(mainHex),
+    50:  mainColor,
+    100: mainColor,
+    200: mainColor,
+    300: mainColor,
+    400: mainColor,
+    500: mainColor,
+    600: mainColor,
+    700: mainColor,
+    800: mainColor,
+    900: mainColor,
   });
 }

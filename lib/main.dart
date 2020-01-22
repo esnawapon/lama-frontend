@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:splashscreen/splashscreen.dart';
 import './app-theme.dart';
 
 void main() => runApp(MyApp());
@@ -29,6 +29,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    // build() is like render()
+    return SplashScreen(
+      seconds: 1,
+      navigateAfterSeconds: AfterSplash(),
+      image: Image.asset(
+        AppTheme.logoBgFile,
+        fit: BoxFit.cover,
+      ),
+      backgroundColor: Colors.white,
+      photoSize: 75.0,
+      loaderColor: Colors.white
+    );
+  }
+}
+
+
+class AfterSplash extends StatelessWidget {
   void _onAddButtonClick() {
     // setState(() {
     //   _counter++;
@@ -37,7 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // build() is like render()
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
