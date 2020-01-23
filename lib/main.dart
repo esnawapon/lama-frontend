@@ -1,10 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:splashscreen/splashscreen.dart';
 import './app-theme.dart';
+import './word.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
+
+final String apiServer = 'http://203.114.69.67:8080/api/v1';
 
 class MyApp extends StatelessWidget {
   @override
@@ -34,17 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // build() is like render()
-    return SplashScreen(
-      seconds: 1,
-      navigateAfterSeconds: AfterSplash(),
-      image: Image.asset(
-        AppTheme.logoBgFile,
-        fit: BoxFit.cover,
-      ),
-      backgroundColor: Colors.white,
-      photoSize: 75.0,
-      loaderColor: Colors.white
-    );
+    return AfterSplash();
   }
 }
 
@@ -57,12 +48,18 @@ class AfterSplash extends StatefulWidget {
 
 class _AfterSplash extends State<AfterSplash> {
   bool isFormValid = false;
+  Word data = Word();
+  List<Word> words = [Word(word: 'test1', definition: 'test2', quote: 'test3')];
   final _newWordFormKey = GlobalKey<FormState>();
-  void _onSave() {
+  void _onSave(context) async {
     if (_newWordFormKey.currentState.validate()) {
-      // call api to save
-    } else {
-      // do nothing
+      _newWordFormKey.currentState.save();
+      // var response = await http.post("$apiServer/words", body: data);
+      setState(() {
+        words.insert(0, data);
+        data = Word();
+      });
+      Navigator.of(context).pop();
     }
   }
 
@@ -98,16 +95,25 @@ class _AfterSplash extends State<AfterSplash> {
                             });
                           }
                         },
+                        onSaved: (value) {
+                          data.word = value;
+                        }
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Definition'
                         ),
+                        onSaved: (value) {
+                          data.definition = value;
+                        }
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Quote'
                         ),
+                        onSaved: (value) {
+                          data.quote = value;
+                        }
                       )
                     ],
                   ),
@@ -122,7 +128,7 @@ class _AfterSplash extends State<AfterSplash> {
                 ),
                 new FlatButton(
                   child: new Text('SAVE'),
-                  onPressed: isFormValid ? _onSave : null,
+                  onPressed: isFormValid ? () => _onSave(context) : null,
                 )
               ],
             );
@@ -142,15 +148,8 @@ class _AfterSplash extends State<AfterSplash> {
           fit: BoxFit.scaleDown,
         ),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(' '),
-            Text(' '),
-            Text(' '),
-            Text(' '),
-          ]
-        ),
+      body: ListView(
+        children: words.map((word) => word.toItem()).toList()
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _onAddButtonClick(context),
@@ -158,7 +157,7 @@ class _AfterSplash extends State<AfterSplash> {
           Icons.add,
           color: Colors.white
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
