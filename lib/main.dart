@@ -47,9 +47,13 @@ class AfterSplash extends StatefulWidget {
 }
 
 class _AfterSplash extends State<AfterSplash> {
+  TextEditingController wordCtrl = TextEditingController();
+  TextEditingController definitionCtrl = TextEditingController();
+  TextEditingController quoteCtrl = TextEditingController();
+
   bool isFormValid = false;
   Word data = Word();
-  List<Word> words = [Word(word: 'test1', definition: 'test2', quote: 'test3')];
+  List<Word> words = [Word(id: 1, word: 'test1', definition: 'test2', quote: 'test3')];
   final _newWordFormKey = GlobalKey<FormState>();
   void _onSave(context) async {
     if (_newWordFormKey.currentState.validate()) {
@@ -63,57 +67,121 @@ class _AfterSplash extends State<AfterSplash> {
     }
   }
 
-  void _onAddButtonClick(context) {
+  void validateForm(_setState) {
+    bool isValid = wordCtrl.text.isNotEmpty;
+    if (isFormValid != isValid) {
+      _setState(() {
+        isFormValid = wordCtrl.text.isNotEmpty;
+      });
+    }
+  }
+
+  void swap1(_setState) {
+    String temp1 = wordCtrl.text;
+    String temp2 = definitionCtrl.text;
+    if (temp2.isEmpty) {
+      wordCtrl.clear();
+    } else {
+      wordCtrl.text = temp2;
+    }
+
+    if (temp1.isEmpty) {
+      definitionCtrl.clear();
+    } else {
+      definitionCtrl.text = temp1;
+    }
+    validateForm(_setState);
+  }
+
+  void swap2() {
+    String temp1 = definitionCtrl.text;
+    String temp2 = quoteCtrl.text;
+    if (temp2.isEmpty) {
+      definitionCtrl.clear();
+    } else {
+      definitionCtrl.text = temp2;
+    }
+
+    if (temp1.isEmpty) {
+      quoteCtrl.clear();
+    } else {
+      quoteCtrl.text = temp1;
+    }
+  }
+
+  void _onOpenDialog(context, Word word) {
+    String title = word == null ? 'New word' : 'Edit my word';
+    if (word != null) wordCtrl.text = word.word;
+    else wordCtrl.clear();
+    if (word != null && word.definition != null) definitionCtrl.text = word.definition;
+    else definitionCtrl.clear();
+    if (word != null && word.quote != null) quoteCtrl.text = word.quote;
+    else quoteCtrl.clear();
+    validateForm(setState);
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, _setState) {
             return AlertDialog(
-              title: new Text('New word'),
+              title: new Text(title),
               content: Form(
                 key: _newWordFormKey,
                 child: Container(
-                  height: 200,
+                  height: 250,
                   child: Column(
                     children: <Widget>[
                       TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Word'
+                          hintText: 'Word'
                         ),
                         validator: (value) {
                           return value.isEmpty ? 'required' : null;
                         },
                         onChanged: (value) {
-                          if (value.isEmpty) {
-                            setState(() {
-                              isFormValid = false;
-                            });
-                          } else {
-                            setState(() {
-                              isFormValid = true;
-                            });
-                          }
+                          validateForm(_setState);
                         },
                         onSaved: (value) {
                           data.word = value;
-                        }
+                        },
+                        controller: wordCtrl,
+                      ),
+                      Container (
+                        child: word == null ? null : IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: Icon(Icons.swap_vert),
+                          onPressed: () {
+                            swap1(_setState);
+                          },
+                        )
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Definition'
+                          hintText: 'Definition'
                         ),
                         onSaved: (value) {
                           data.definition = value;
-                        }
+                        },
+                        controller: definitionCtrl
+                      ),
+                      Container (
+                        child: word == null ? null : IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: Icon(Icons.swap_vert),
+                          onPressed: () {
+                            swap2();
+                          },
+                        )
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Quote'
+                          hintText: 'Quote'
                         ),
                         onSaved: (value) {
                           data.quote = value;
-                        }
+                        },
+                        controller: quoteCtrl
                       )
                     ],
                   ),
@@ -149,10 +217,10 @@ class _AfterSplash extends State<AfterSplash> {
         ),
       ),
       body: ListView(
-        children: words.map((word) => word.toItem()).toList()
+        children: words.map((word) => word.toItem(_onOpenDialog, context)).toList()
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _onAddButtonClick(context),
+        onPressed: () => _onOpenDialog(context, null),
         child: Icon(
           Icons.add,
           color: Colors.white
