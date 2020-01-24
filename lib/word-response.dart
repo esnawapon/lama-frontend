@@ -6,7 +6,7 @@ class WordResponse<T> {
 
   WordResponse({this.result, this.message});
 
-  factory WordResponse.fromJson(Map<String, dynamic> parsedJson) {
+  factory WordResponse.fromJson(parsedJson) {
     return WordResponse(
       result: parsedJson['result'].map<Word>((each) => (
         Word(

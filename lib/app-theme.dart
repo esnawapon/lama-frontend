@@ -17,4 +17,5 @@ class AppTheme {
     800: mainColor,
     900: mainColor,
   });
+  static Color grey = Color(0xFF546E7A);
 }
