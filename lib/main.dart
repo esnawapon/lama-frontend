@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lama_frontend/authentication.dart';
 import 'package:lama_frontend/date-item.dart';
 import 'package:lama_frontend/word-dialog.dart';
 import 'package:lama_frontend/word-item.dart';
@@ -6,11 +7,9 @@ import './app-theme.dart';
 import './word.dart';
 import 'package:dio/dio.dart';
 import './word-response.dart';
+import './constants.dart';
 
 void main() => runApp(MyApp());
-
-final String apiServer = 'http://0b868d5e.ngrok.io/api/v1';
-// final String apiServer = 'http://172.19.0.1:8080/api/v1';
 
 class MyApp extends StatelessWidget {
   @override
@@ -45,20 +44,21 @@ class AfterSplash extends StatefulWidget {
 }
 
 class _AfterSplash extends State<AfterSplash> {
+  Authentication auth;
   Map<String, List<Word>> words = {};
   void onSave(oldWord, newWord) async {
     Dio dio = Dio();
     if (oldWord == null) {
       newWord['user_id'] = 'es';
-      await dio.post("$apiServer/words", data: newWord);
+      await dio.post("${Constants.apiServer}/words", data: newWord, options: this.auth.getCredentialOption());
     } else {
-      await dio.put("$apiServer/words/${oldWord.id}", data: newWord);
+      await dio.put("${Constants.apiServer}/words/${oldWord.id}", data: newWord, options: this.auth.getCredentialOption());
     }
     fetchWords();
   }
 
   void onDelete(Word deletingWord) async {
-    await Dio().delete("$apiServer/words/${deletingWord.id}");
+    await Dio().delete("${Constants.apiServer}/words/${deletingWord.id}", options: this.auth.getCredentialOption());
     fetchWords();
   }
 
@@ -113,7 +113,7 @@ class _AfterSplash extends State<AfterSplash> {
 
   fetchWords() async {
     print('fetching');
-    Response rawResponse = await Dio().get("$apiServer/words");
+    Response rawResponse = await Dio().get("${Constants.apiServer}/words", options: this.auth.getCredentialOption());
     print('fetched');
     print(rawResponse);
     WordResponse response = WordResponse.fromJson(rawResponse.data);
@@ -130,9 +130,18 @@ class _AfterSplash extends State<AfterSplash> {
     });
   }
 
+  Future login() async {
+    print("Authenticating...");
+    this.auth = Authentication(Constants.credential);
+    await this.auth.fetchAuthToken();
+    print("Got User Token");
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchWords();
+    login().then((r) {
+      fetchWords();
+    });
   }
 }

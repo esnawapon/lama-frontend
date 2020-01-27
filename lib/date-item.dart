@@ -13,6 +13,7 @@ class DateItem extends StatelessWidget {
       formatedDate = date;
     }
     return Container(
+      key: Key(date),
       padding: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Text(formatedDate,
         style: TextStyle(
