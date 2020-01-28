@@ -50,7 +50,7 @@ class _AfterSplash extends State<AfterSplash> {
     Dio dio = Dio();
     if (oldWord == null) {
       newWord['user_id'] = 'es';
-      await dio.post("${Constants.apiServer}/words", data: newWord, options: this.auth.getCredentialOption());
+      await dio.post("${Constants.apiServer}/words/", data: newWord, options: this.auth.getCredentialOption());
     } else {
       await dio.put("${Constants.apiServer}/words/${oldWord.id}", data: newWord, options: this.auth.getCredentialOption());
     }
@@ -112,8 +112,8 @@ class _AfterSplash extends State<AfterSplash> {
   }
 
   fetchWords() async {
-    print('fetching');
-    Response rawResponse = await Dio().get("${Constants.apiServer}/words", options: this.auth.getCredentialOption());
+    print('fetching...');
+    Response rawResponse = await Dio().get("${Constants.apiServer}/words/", options: this.auth.getCredentialOption());
     print('fetched');
     print(rawResponse);
     WordResponse response = WordResponse.fromJson(rawResponse.data);

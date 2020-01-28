@@ -10,12 +10,13 @@ class Authentication {
   String token;
 
   void regisNewUser() async {
-    await Dio().post("${Constants.apiServer}/authenticate", data: credential.toObject());
+    await Dio().post("${Constants.apiServer}/user", data: credential.toObject());
   }
 
   Future fetchAuthToken() async {
     Response response = await Dio().post("${Constants.apiServer}/authenticate", data: credential.toObject());
     token = response.data['token'].toString();
+    print("token: $token");
     return response;
   }
 
